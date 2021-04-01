@@ -10,8 +10,6 @@ const app = express();
 const middleware = [cors(), bodyParser.json(), morgan("dev")];
 app.use(middleware);
 
- 
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.zuq5f.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, {
@@ -29,13 +27,12 @@ client.connect((err) => {
     } catch (e) {
       console.log(e);
     }
-  });  
+  });
   app.get("/admin/posts", (req, res) => {
     try {
-      collection.find().toArray((err,data)=>{
-        res.send(data)
-      })
-      
+      collection.find().toArray((err, data) => {
+        res.send(data);
+      });
     } catch (e) {
       console.log(e);
     }
@@ -53,12 +50,23 @@ client.connect((err) => {
     }
   });
 
-  app.post("/posts/delete",(req,res)=>{
-    console.log(req.body.id)
-    collection.deleteOne({"_id":ObjectId(req.body.id)})
+  app.post("/posts/delete", (req, res) => {
+    console.log(req.body.id);
+    collection.deleteOne({ _id: ObjectId(req.body.id) });
+  });
 
-  })
-   
+  app.post("/posts/search", (req, res) => {
+     const search = req.body.input
+    try {
+      collection.find({name : {'$regex': search} }).toArray((err,data)=>{
+              res.send(data)
+      })
+    } catch (e) {
+      res.send("server Error!!!");
+    }
+  });
+
+  
 });
 
 client.connect((err) => {

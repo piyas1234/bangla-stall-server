@@ -10,9 +10,7 @@ const app = express();
 const middleware = [cors(), bodyParser.json(), morgan("dev")];
 app.use(middleware);
 
-app.get("/", (req, res) => {
-  res.send("hello");
-});
+ 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.zuq5f.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
@@ -87,6 +85,9 @@ client.connect((err) => {
   });
 });
 
+app.get("/", (req, res) => {
+  res.send("hello");
+});
 const port = process.env.PORT || 2000;
 app.listen(port, () => {
   console.log(`the port is running on ${port}`);

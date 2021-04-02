@@ -41,8 +41,6 @@ client.connect((err) => {
   app.post("/admin/postsbyemail", (req, res) => {
     try {
       collection.find({ email: req.body.email }).toArray((err, data) => {
-        console.log(data);
-        console.log(err);
         res.send(data);
       });
     } catch (e) {
@@ -50,30 +48,34 @@ client.connect((err) => {
     }
   });
 
-  app.post("/posts/delete", (req, res) => {
-    console.log(req.body.id);
-    collection.deleteOne({ _id: ObjectId(req.body.id) });
+  app.delete("/posts/delete/:id", (req, res) => {
+    collection
+      .deleteOne({ _id: ObjectId(req.params.id) })
+      .then((data) => {
+        console.log(data.deletedCount);
+        res.send({ count: data.deletedCount });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   });
 
   app.post("/posts/search", (req, res) => {
-     const search = req.body.input
+    const search = req.body.input;
     try {
-      collection.find({name : {'$regex': search} }).toArray((err,data)=>{
-              res.send(data)
-      })
+      collection.find({ name: { $regex: search } }).toArray((err, data) => {
+        res.send(data);
+      });
     } catch (e) {
       res.send("server Error!!!");
     }
   });
-
-  
 });
 
 client.connect((err) => {
   const collection = client.db(process.env.DB_NAME).collection("checkout");
   app.post("/admin/checkout", (req, res) => {
     try {
-      console.log(req.body);
       collection.insertOne(req.body);
       res.send("data saved");
     } catch (e) {
@@ -84,7 +86,6 @@ client.connect((err) => {
   app.post("/user/checkout", (req, res) => {
     try {
       collection.find({ email: req.body.email }).toArray((err, data) => {
-        console.log(data);
         res.send(data);
       });
     } catch (e) {
